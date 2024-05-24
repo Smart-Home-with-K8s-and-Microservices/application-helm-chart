@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mqttbroker-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mqttbroker-app
+  template:
+    metadata:
+      labels:
+        app: mqttbroker-app
+    spec:
+      containers:
+      - name: mqttbroker
+        image: eclipse-mosquitto
+        ports:
+        - containerPort: 1883
+        - containerPort: 9001
+        volumeMounts:
+        - name: mqtt-data
+          mountPath: /mosquitto/data
+        - name: mqtt-log
+          mountPath: /mosquitto/log
+        - name: mosquitto-config
+          mountPath: /mosquitto/config/mosquitto.conf
+          subPath: mosquitto.conf
+      volumes:
+      - name: mqtt-data
+        persistentVolumeClaim:
+          claimName: mqtt-data-pvc
+      - name: mqtt-log
+        persistentVolumeClaim:
+          claimName: mqtt-log-pvc
+      - name: mosquitto-config
+        configMap:
+          name: mosquitto-config

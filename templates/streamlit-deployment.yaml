@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gui-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gui-app
+  template:
+    metadata:
+      labels:
+        app: gui-app
+    spec:
+      containers:
+        - name: gui-container
+          image: ghcr.io/smart-home-with-k8s-and-microservices/application-gui-service:v1
+          ports:
+            - containerPort: 8501
+          env:
+            - name: BACKEND_URL
+              value: "http://web:8000/api/"
+            - name: DOCKER_INFLUXDB_INIT_ORG
+              value: "home_automation"
+            - name: DOCKER_INFLUXDB_INIT_BUCKET
+              value: "sensor_data_bucket"
+            - name: DOCKER_INFLUXDB_INIT_ADMIN_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: influxdb-admin-token
+                  key: token
+            - name: DOCKER_INFLUXDB_HOST_TYPE
+              value: "http"
+            - name: DOCKER_INFLUXDB_HOST
+              value: "influxdb"
+            - name: DOCKER_INFLUXDB_PORT
+              value: "8086"
+
+

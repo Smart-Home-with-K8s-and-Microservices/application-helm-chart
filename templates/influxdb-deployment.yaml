@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: influxdb-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: influxdb-app
+  template:
+    metadata:
+      labels:
+        app: influxdb-app
+    spec:
+      containers:
+      - name: influxdb-container
+        image: influxdb:latest
+        ports:
+        - containerPort: 8086
+        volumeMounts:
+        - name: influxdb-data
+          mountPath: /var/lib/influxdb2
+        - name: influxdb-config
+          mountPath: /etc/influxdb2
+        env:
+        - name: DOCKER_INFLUXDB_INIT_MODE
+          value: "setup"
+        - name: DOCKER_INFLUXDB_INIT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: influxdb-username
+              key: token 
+        - name: DOCKER_INFLUXDB_INIT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: influxdb-password
+              key: token
+        - name: DOCKER_INFLUXDB_INIT_ORG
+          value: "home_automation"
+        - name: DOCKER_INFLUXDB_INIT_BUCKET
+          value: "sensor_data_bucket"
+        - name: DOCKER_INFLUXDB_INIT_ADMIN_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: influxdb-admin-token
+              key: token                
+      volumes:
+      - name: influxdb-data
+        persistentVolumeClaim:
+          claimName: influxdb-data-pvc
+      - name: influxdb-config
+        persistentVolumeClaim:
+          claimName: influxdb-config-pvc

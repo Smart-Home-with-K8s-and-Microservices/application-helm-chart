@@ -1,0 +1,69 @@
+pvc:
+# mqtt
+- name: mqtt-log-pvc
+  storage: 200Mi
+- name: mqtt-data-pvc
+  storage: 1Gi
+# postgres
+- name: postgres-pvc
+  storage: 1Gi
+# influx
+- name: influxdb-data-pvc
+  storage: 1Gi
+- name: influxdb-config-pvc
+  storage: 200Mi
+
+services:
+  - serviceName: mqttbroker
+    appName: mqttbroker-app
+    port: 1883
+    nodePort: 30883
+    useNodePort: true
+  - serviceName: web
+    appName: web-app
+    port: 8000
+    nodePort: 30800
+    useNodePort: true
+  - serviceName: influxdb
+    appName: influxdb-app
+    port: 8086
+    nodePort: 30886
+    useNodePort: true
+  - serviceName: db
+    appName: postgres
+    port: 5432
+    useNodePort: false
+  - serviceName: streamlit
+    appName: gui-app
+    port: 8501
+    nodeport: 30851
+    useNodePort: true
+
+secrets:
+  # influxdb
+  - name: influxdb-admin-token
+    data:
+      token: adminToken123
+  - name: influxdb-username
+    data:
+      token: panos
+  - name: influxdb-password
+    data:
+      token: password
+  # postgres
+  - name: postgres-username
+    data:
+      token: postgres
+  - name: postgres-password
+    data:
+      token: postgres
+  # django
+  - name: django-superuser-mail
+    data:
+      token: panastasiadis@mail.com
+  - name: django-superuser-username
+    data:
+      token: panastasiadis
+  - name: django-superuser-password
+    data:
+      token: "1234"

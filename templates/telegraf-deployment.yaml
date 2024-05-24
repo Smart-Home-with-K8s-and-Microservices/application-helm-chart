@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: telegraf-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: telegraf-app
+  template:
+    metadata:
+      labels:
+        app: telegraf-app
+    spec:
+      containers:
+      - name: telegraf-container
+        image: telegraf:latest
+        volumeMounts:
+        - name: telegraf-config
+          mountPath: /etc/telegraf/telegraf.conf
+          subPath: telegraf.conf
+        env:
+        - name: DOCKER_INFLUXDB_INIT_ORG
+          value: "home_automation"
+        - name: DOCKER_INFLUXDB_INIT_BUCKET
+          value: "sensor_data_bucket"
+        - name: DOCKER_INFLUXDB_INIT_ADMIN_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: influxdb-admin-token
+              key: token
+        - name: DOCKER_INFLUXDB_HOST
+          value: "influxdb"
+        - name: DOCKER_INFLUXDB_PORT
+          value: "8086"
+        - name: DOCKER_MQTT_BROKER_HOST
+          value: "mqttbroker"
+        - name: DOCKER_MQTT_BROKER_PORT
+          value: "1883"
+
+      volumes:
+      - name: telegraf-config
+        configMap:
+          name: telegraf-config

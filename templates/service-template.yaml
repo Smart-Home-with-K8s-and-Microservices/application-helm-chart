@@ -1,0 +1,19 @@
+# templates/service.yaml
+{{- range .Values.services }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .serviceName }}
+spec:
+  selector:
+    app: {{ .appName }} # Assuming the selector is based on the service name
+  ports:
+    - protocol: TCP
+      port: {{ .port }}
+      targetPort: {{ .port }}
+  {{- if .useNodePort }}
+      nodePort: {{ .nodePort }}
+  type: NodePort
+  {{- end }}
+{{- end }}

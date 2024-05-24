@@ -1,0 +1,16 @@
+# templates/pvc.yaml
+{{- range .Values.pvc }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .name }}
+  namespace: default
+spec:
+  accessModes:
+  - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: {{ .storage }}
+{{- end }}
